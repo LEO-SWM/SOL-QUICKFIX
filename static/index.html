@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOL QUICKFIX</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      align-items: center;
+      border: 1px solid #dddddd;
+      text-align: center;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td style="display: flex; justify-content: center; align-items: center;">
+        <button id="button1" onclick="queryUser()">Query User</button>
+        <button id="button2" onclick="queryPanel()">Query Panel</button>
+        <button id="button3" onclick="uploadOrders()">Upload Orders</button>
+        <button id="button4" onclick="uploadFlash()">Upload Flash</button>
+        <div id="userQuery" style="display: none;">
+          <input type="text" id="userSearchInput" name="query" placeholder="Name of User...">
+          <button onclick="submitUserForm()">Search</button>
+          <button onclick="downloadUser()">Download</button>
+        </div>
+        <div id="panelQuery" style="display: none;">
+          <input type="text" id="panelSearchInput" name="query" placeholder="Serial number of Panel...">
+          <button onclick="submitPanelForm()">Search</button>
+          <button onclick="downloadPanel()">Download</button>
+        </div>
+        <div id="orderUpload" style="display: none;">
+          <input type="file" id="ordersFileInput" name="ORDERS FILE" multiple />
+          <button onclick="uploadOrdersFile()">Upload Orders</button>
+        </div>
+        <div id="flashUpload" style="display: none;">
+          <input type="file" id="flashFileInput" name="FLASH FILE" multiple />
+          <button onclick="uploadFlashFile()">Upload Flash</button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div>
+          <table id="dataTable" style="display: none;"></table>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <script>
+    function hideButtons(){
+      document.getElementById('button1').style.display = 'none';
+      document.getElementById('button2').style.display = 'none';
+      document.getElementById('button3').style.display = 'none';
+      document.getElementById('button4').style.display = 'none';
+    }
+
+    function unhideForm(id){
+      document.getElementById(id).style.display = 'inline';
+    }
+    function queryUser() {
+      hideButtons();
+      unhideForm('userQuery');
+    }
+    function uploadOrders(){
+      hideButtons();
+      unhideForm('orderUpload');
+    }
+    function uploadFlash(){
+      hideButtons();
+      unhideForm('flashUpload');
+    }
+    function queryPanel() {
+      hideButtons();
+      unhideForm('panelQuery');
+    }
+  </script>
+  <script>
+    function uploadOrdersFile() {
+      const formData = new FormData();
+      const file = document.getElementById('ordersFileInput').files[0];
+      formData.append('file', file);
+      fetch('http://127.0.0.1:8000/upload_orders/', {
+        method: 'POST',
+        body: formData
+      });
+    }
+    function uploadFlashFile() {
+      const formData = new FormData();
+      const file = document.getElementById('flashFileInput').files[0];
+      formData.append('file', file);
+      fetch('http://127.0.0.1:8000/upload_flash/', {
+        method: 'POST',
+        body: formData
+      });
+    }
+    function submitUserForm() {
+      var username = document.getElementById('userSearchInput').value;
+      if (username.trim() !== '') {
+        fetch(`http://127.0.0.1:8000/users/${username}`)
+          .then(response => response.json())
+          .then(data => {
+            displayData(data);
+          })
+          .catch(error => console.error('Error:', error));
+
+        fetch(`http://127.0.0.1:8000/download_user/${username}`)
+          .then(response => response.json())
+          .then(data => {
+            displayData(data);
+          })
+          .catch(error => console.error('Error:', error));
+      }
+    }
+    function downloadUser() {
+      var username = document.getElementById('userSearchInput').value;
+      if (username.trim() !== '') {
+        window.open(`http://127.0.0.1:8000/download_user/${username}`)
+      }
+    }
+    function downloadPanel() {
+      var panel = document.getElementById('panelSearchInput').value;
+      if (panel.trim() !== '') {
+        window.open(`http://127.0.0.1:8000/download_panel/${panel}`)
+      }
+    }
+    function submitPanelForm() {
+      var panel = document.getElementById('panelSearchInput').value;
+      if (panel.trim() !== '') {
+        fetch(`http://127.0.0.1:8000/panels/${panel}`)
+          .then(response => response.json())
+          .then(data => {
+            displayData(data);
+          })
+          .catch(error => console.error('Error:', error));
+      }
+    }
+
+    function displayData(data) {
+      var table = document.getElementById('dataTable');
+      while (table.firstChild) {
+        table.removeChild(table.lastChild);
+      }
+
+      var headers = Object.keys(data[0]);
+      var headerRow = table.insertRow(0);
+      headers.forEach(headerText => {
+        var header = document.createElement('th');
+        header.textContent = headerText;
+        headerRow.appendChild(header);
+      });
+
+      data.forEach(obj => {
+        var row = table.insertRow();
+        headers.forEach(headerText => {
+          var cell = row.insertCell();
+          cell.textContent = obj[headerText];
+        });
+      });
+
+      table.style.display = 'inline';
+    }
+  </script>
+</body>
+</html>
