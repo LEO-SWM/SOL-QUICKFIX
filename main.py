@@ -41,7 +41,7 @@ async def download_panel(panel):
     return transfer.download_df(df, panel)
 
 
-@app.get("/query/")
+@app.get("/")
 async def query():
     return FileResponse("static/index.html")
 
