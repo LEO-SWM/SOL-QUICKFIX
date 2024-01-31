@@ -29,13 +29,13 @@ async def query_serial_number(panel):
     return querier.get_panel_info(panel).to_dict(orient="records")
 
 
-@app.get("/download_user/{user}/")
+@app.get("/users/{user}/download")
 async def download_user(user):
     df = querier.get_user_infos(user)
     return transfer.download_df(df, user)
 
 
-@app.get("/download_panel/{panel}/")
+@app.get("/panels/{panel}/download")
 async def download_panel(panel):
     df = querier.get_panel_info(panel)
     return transfer.download_df(df, panel)

@@ -151,13 +151,13 @@
     function downloadUser() {
       var username = document.getElementById('userSearchInput').value;
       if (username.trim() !== '') {
-        window.open(`http://127.0.0.1:8000/download_user/${username}`)
+        window.open(`http://127.0.0.1:8000/users/${username}/download`)
       }
     }
     function downloadPanel() {
       var panel = document.getElementById('panelSearchInput').value;
       if (panel.trim() !== '') {
-        window.open(`http://127.0.0.1:8000/download_panel/${panel}`)
+        window.open(`http://127.0.0.1:8000/panels/${panel}/download`)
       }
     }
     function submitPanelForm() {
