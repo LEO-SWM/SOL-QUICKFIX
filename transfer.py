@@ -19,10 +19,6 @@ class Transfer:
         return file_type in self.allowed_file_types
 
     def import_infos(self, excel_file, table_name):
-        if not self.is_file_type_allowed(excel_file.content_type):
-            raise HTTPException(
-                status_code=422, detail="This filetype is not supported"
-            )
         # Read the Excel file
         df = pd.read_excel(excel_file)
         # Create a database connection
