@@ -4,14 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SOL QUICKFIX</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   <style>
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
       margin: 0;
-      background-color: #f4f4f4;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    .button-container {
+      text-align: center;
+    }
+
+    .button-container button {
+      margin: 5px; /* Adjust as necessary for desired spacing */
     }
 
     button {
@@ -22,67 +38,117 @@
       border-radius: 5px;
       margin: 10px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, box-shadow 0.2s;
+      font-size: 0.9rem;
+      outline: none;
     }
 
     button:hover {
       background-color: #0056b3;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
+    button i {
+      margin-right: 5px;
+    }
+    .table-container {
+      overflow-x: auto; /* Enable horizontal scrolling */
+      margin-top: 20px; /* Keep the spacing consistent */
+    }
     table {
-      border-collapse: collapse;
       width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
+
     th, td {
-      align-items: center;
       border: 1px solid #dddddd;
-      text-align: center;
-      padding: 8px;
+      text-align: left;
+      padding: 12px;
     }
+
     th {
       background-color: #f2f2f2;
+      position: sticky;
+      left: 0;
+      background-color: #fff;
+      box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
     }
-    tr:nth-child(even) {
+
+    tr:nth-child(odd) td:first-child {
+      background-color: #f9f9f9;
+    }
+
+    tr:nth-child(even) td:first-child {
       background-color: #f2f2f2;
+    }
+
+    tr td:first-child {
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .form-hidden {
+      display: none;
+    }
+
+    .form-group {
+      margin: 10px;
+    }
+
+    input[type="text"], input[type="file"] {
+      padding: 10px;
+      margin-right: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      width: calc(100% - 260px);
+    }
+
+    input[type="file"] {
+      border: none;
     }
   </style>
 </head>
 <body>
-  <table>
-    <tr>
-      <td style="display: flex; justify-content: center; align-items: center;">
-        <button id="button1" onclick="queryUser()">Query User</button>
-        <button id="button2" onclick="queryPanel()">Query Panel</button>
-        <button id="button3" onclick="uploadOrders()">Upload Orders</button>
-        <button id="button4" onclick="uploadFlash()">Upload Flash</button>
-        <div id="userQuery" style="display: none;">
-          <input type="text" id="userSearchInput" name="query" placeholder="Name of User...">
-          <button onclick="submitUserForm()">Search</button>
-          <button onclick="downloadUser()">Download</button>
-        </div>
-        <div id="panelQuery" style="display: none;">
-          <input type="text" id="panelSearchInput" name="query" placeholder="Serial number of Panel...">
-          <button onclick="submitPanelForm()">Search</button>
-          <button onclick="downloadPanel()">Download</button>
-        </div>
-        <div id="orderUpload" style="display: none;">
-          <input type="file" id="ordersFileInput" name="ORDERS FILE" multiple />
-          <button onclick="uploadOrdersFile()">Upload Orders</button>
-        </div>
-        <div id="flashUpload" style="display: none;">
-          <input type="file" id="flashFileInput" name="FLASH FILE" multiple />
-          <button onclick="uploadFlashFile()">Upload Flash</button>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div>
-          <table id="dataTable" style="display: none;"></table>
-        </div>
-      </td>
-    </tr>
-  </table>
+  <div class="container">
+    <div class="button-container button-group">
+      <button id="button1" onclick="queryUser()"><i class="fa fa-user"></i>Query User</button>
+      <button id="button2" onclick="queryPanel()"><i class="fa-solid fa-solar-panel"></i>Query Panel</button>
+      <button id="button3" onclick="uploadOrders()"><i class="fa fa-upload"></i>Upload Orders</button>
+      <button id="button4" onclick="uploadFlash()"><i class="fa fa-upload"></i>Upload Flash</button>
+    </div>
+  <div>
+
+  <div>
+    <div id="userQuery" class="form-hidden form-group">
+      <input type="text" id="userSearchInput" name="query" placeholder="Name of User...">
+      <button onclick="submitUserForm()">Search</button>
+      <button onclick="downloadUser()">Download</button>
+    </div>
+
+    <div id="panelQuery" class="form-hidden form-group">
+      <input type="text" id="panelSearchInput" name="query" placeholder="Serial number of Panel...">
+      <button onclick="submitPanelForm()">Search</button>
+      <button onclick="downloadPanel()">Download</button>
+    </div>
+
+    <div id="orderUpload" class="form-hidden form-group">
+      <input type="file" id="ordersFileInput" name="ORDERS FILE" multiple />
+      <button onclick="uploadOrdersFile()">Upload Orders</button>
+    </div>
+
+    <div id="flashUpload" class="form-hidden form-group">
+      <input type="file" id="flashFileInput" name="FLASH FILE" multiple />
+      <button onclick="uploadFlashFile()">Upload Flash</button>
+    </div>
+    <div class="table-container">
+      <table id="dataTable" class="form-hidden"></table>
+    </div>
+  </div>
+
   <script>
     function hideButtons(){
       document.getElementById('button1').style.display = 'none';
@@ -110,8 +176,6 @@
       hideButtons();
       unhideForm('panelQuery');
     }
-  </script>
-  <script>
     function uploadOrdersFile() {
       const formData = new FormData();
       const file = document.getElementById('ordersFileInput').files[0];
@@ -175,26 +239,24 @@
     function displayData(data) {
       var table = document.getElementById('dataTable');
       while (table.firstChild) {
-        table.removeChild(table.lastChild);
+        table.removeChild(table.firstChild);
       }
 
-      var headers = Object.keys(data[0]);
-      var headerRow = table.insertRow(0);
-      headers.forEach(headerText => {
-        var header = document.createElement('th');
-        header.textContent = headerText;
-        headerRow.appendChild(header);
-      });
+      for (var property in data[0]) {
+        if (data[0].hasOwnProperty(property)) {
+          var row = table.insertRow();
+          var cellHeader = row.insertCell();
+          cellHeader.textContent = property;
+          cellHeader.style.fontWeight = 'bold';
 
-      data.forEach(obj => {
-        var row = table.insertRow();
-        headers.forEach(headerText => {
-          var cell = row.insertCell();
-          cell.textContent = obj[headerText];
-        });
-      });
+          data.forEach(function(item) {
+            var cell = row.insertCell();
+            cell.textContent = item[property];
+          });
+        }
+      }
 
-      table.style.display = 'inline';
+      table.style.display = 'block';
     }
   </script>
 </body>
