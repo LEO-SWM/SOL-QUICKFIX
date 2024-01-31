@@ -1,8 +1,6 @@
 import io
-
 import pandas as pd
-from fastapi import HTTPException
-from sqlalchemy import create_engine, MetaData, delete, select, Table
+from sqlalchemy import create_engine, MetaData, delete, Table
 from starlette.responses import StreamingResponse
 
 
@@ -24,7 +22,7 @@ class Transfer:
         # Create a database connection
         metadata = MetaData()
         metadata.reflect(bind=self.engine)
-        if self.flash_table_name in metadata.tables:
+        if table_name in metadata.tables:
             with self.engine.connect() as connection:
                 to_delete = df["Seriennummer"]
                 table = Table(table_name, metadata, autoload=True)
