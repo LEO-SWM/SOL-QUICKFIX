@@ -15,6 +15,11 @@ def startup():
     db_interface.initialize_database()
 
 
+@app.get("/")
+async def query():
+    return FileResponse("static/index.html")
+
+
 @app.get("/users/{user}/")
 async def query_user(user):
     return db_interface.get_user_infos(user).to_dict(orient="records")
@@ -35,11 +40,6 @@ async def download_user(user):
 async def download_panel(panel):
     df = db_interface.get_panel_info(panel)
     return db_interface.download_df(df, panel)
-
-
-@app.get("/")
-async def query():
-    return FileResponse("static/index.html")
 
 
 @app.post("/upload_orders/")
