@@ -1,8 +1,10 @@
 import io
+
 import pandas as pd
+from sqlalchemy import create_engine, MetaData, delete, select
 from sqlalchemy.orm import sessionmaker
 from starlette.responses import StreamingResponse
-from sqlalchemy import create_engine, MetaData, delete, select, Table
+
 from models import Base
 from models.flash import Flash
 from models.order import Order
