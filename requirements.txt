@@ -5,3 +5,4 @@ uvicorn
 openpyxl
 xlsxwriter
 python-multipart
+starlette
