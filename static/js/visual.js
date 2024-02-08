@@ -33,7 +33,6 @@ function displayData(data) {
     emptyTable();
 
     if(!data || !data.length){
-        console.log("HEREE")
         const row = table.insertRow();
         const cellHeader = row.insertCell();
         cellHeader.textContent = "Nothing found";
