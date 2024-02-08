@@ -1,8 +1,8 @@
 pandas
 SQLAlchemy
-fastapi
+fastapi==0.109.2
 uvicorn
 openpyxl
 xlsxwriter
 python-multipart
-starlette
+starlette==0.37.0
