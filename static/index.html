@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f9f9f9;
       margin: 0;
       padding: 20px;
@@ -116,7 +116,7 @@
   <div class="container">
     <div class="button-container button-group">
       <button id="button1" onclick="queryUser()"><i class="fa fa-user"></i>Query User</button>
-      <button id="button2" onclick="queryPanel()"><i class="fa-solid fa-solar-panel"></i>Query Panel</button>
+      <button id="button2" onclick="queryPanel()"><i class="fa fa-solar-panel"></i>Query Panel</button>
       <button id="button3" onclick="uploadOrders()"><i class="fa fa-upload"></i>Upload Orders</button>
       <button id="button4" onclick="uploadFlash()"><i class="fa fa-upload"></i>Upload Flash</button>
     </div>
@@ -151,30 +151,41 @@
 
   <script>
     function hideButtons(){
-      document.getElementById('button1').style.display = 'none';
-      document.getElementById('button2').style.display = 'none';
-      document.getElementById('button3').style.display = 'none';
-      document.getElementById('button4').style.display = 'none';
     }
 
     function unhideForm(id){
-      document.getElementById(id).style.display = 'inline';
+      document.getElementById(id).style.display = 'block';
+    }
+    function hideForm(id){
+      document.getElementById(id).style.display = 'none';
     }
     function queryUser() {
       hideButtons();
       unhideForm('userQuery');
+      hideForm('orderUpload');
+      hideForm('flashUpload');
+      hideForm('panelQuery');
     }
     function uploadOrders(){
       hideButtons();
       unhideForm('orderUpload');
+      hideForm('userQuery');
+      hideForm('flashUpload');
+      hideForm('panelQuery');
     }
     function uploadFlash(){
       hideButtons();
       unhideForm('flashUpload');
+      hideForm('userQuery');
+      hideForm('orderUpload');
+      hideForm('panelQuery');
     }
     function queryPanel() {
       hideButtons();
       unhideForm('panelQuery');
+      hideForm('userQuery');
+      hideForm('orderUpload');
+      hideForm('flashUpload');
     }
     function uploadOrdersFile() {
       const formData = new FormData();
