@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOL QUICKFIX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script type="text/javascript" src="static/js/query.js"></script>
+    <script type="text/javascript" src="static/js/visual.js"></script>
     <style>
       body {
         font-family: Tahoma, Geneva, Verdana, sans-serif;
@@ -157,137 +159,5 @@
         <table id="dataTable" class="form-hidden"></table>
       </div>
     </div>
-
-    <script>
-      const formIds = ['studentQuery', 'orderUpload', 'flashUpload', 'panelQuery', 'mixedQuery']
-
-      function hideAllForms(){
-        for(let formId of formIds){
-          document.getElementById(formId).style.display = 'none';
-        }
-      }
-      function onlyKeepForm(id){
-        hideAllForms();
-        hideTable()
-        document.getElementById(id).style.display = 'block';
-      }
-      function uploadOrdersFile() {
-        const formData = new FormData();
-        const file = document.getElementById('ordersFileInput').files[0];
-        formData.append('file', file);
-        fetch('http://127.0.0.1:8000/upload_orders/', {
-          method: 'POST',
-          body: formData
-        });
-        window.location.reload();
-      }
-      function uploadFlashFile() {
-        const formData = new FormData();
-        const file = document.getElementById('flashFileInput').files[0];
-        formData.append('file', file);
-        fetch('http://127.0.0.1:8000/upload_flash/', {
-          method: 'POST',
-          body: formData
-        });
-        window.location.reload();
-      }
-      function submitStudentForm() {
-        const name = document.getElementById('studentSearchInput').value;
-        if (name.trim() !== '') {
-          fetch(`http://127.0.0.1:8000/students/${name}`)
-            .then(response => response.json())
-            .then(data => {
-              displayData(data);
-            })
-            .catch(error => console.error('Error:', error));
-        }
-      }
-
-      function submitPanelForm() {
-        const panel = document.getElementById('panelSearchInput').value;
-        if (panel.trim() !== '') {
-          fetch(`http://127.0.0.1:8000/panels/${panel}`)
-            .then(response => response.json())
-            .then(data => {
-              displayData(data);
-            })
-            .catch(error => console.error('Error:', error));
-        }
-      }
-
-      function submitMixedForm() {
-        const query = document.getElementById('mixedSearchInput').value;
-        if (query.trim() !== '') {
-          fetch(`http://127.0.0.1:8000/mixed/${query}`)
-            .then(response => response.json())
-            .then(data => {
-              displayData(data);
-            })
-            .catch(error => console.error('Error:', error));
-        }
-      }
-
-      function downloadStudent() {
-        const name = document.getElementById('studentSearchInput').value;
-        if (name.trim() !== '') {
-          window.open(`http://127.0.0.1:8000/students/${name}/download`)
-        }
-      }
-      function downloadPanel() {
-        const panel = document.getElementById('panelSearchInput').value;
-        if (panel.trim() !== '') {
-          window.open(`http://127.0.0.1:8000/panels/${panel}/download`)
-        }
-      }
-      function downloadMixed() {
-        const query = document.getElementById('mixedSearchInput').value;
-        if (query.trim() !== '') {
-          window.open(`http://127.0.0.1:8000/mixed/${query}/download`)
-        }
-      }
-
-      function hideTable(){
-        const table = document.getElementById('dataTable');
-        table.style.display = 'none';
-      }
-      function unhideTable(){
-        const table = document.getElementById('dataTable');
-        table.style.display = 'block';
-      }
-      function emptyTable(){
-        const table = document.getElementById('dataTable');
-
-        while (table.firstChild) {
-          table.removeChild(table.firstChild);
-        }
-      }
-      function displayData(data) {
-        const table = document.getElementById('dataTable');
-        emptyTable();
-
-        if(!data || !data.length){
-          console.log("HEREE")
-          const row = table.insertRow();
-          const cellHeader = row.insertCell();
-          cellHeader.textContent = "Nothing found";
-          cellHeader.style.fontWeight = 'bold';
-        } else {
-          for (let property in data[0]) {
-            if (data[0].hasOwnProperty(property)) {
-              const row = table.insertRow();
-              const cellHeader = row.insertCell();
-              cellHeader.textContent = property;
-              cellHeader.style.fontWeight = 'bold';
-
-              data.forEach(function(item) {
-                const cell = row.insertCell();
-                cell.textContent = item[property];
-              });
-            }
-          }
-        }
-        unhideTable();
-      }
-    </script>
   </body>
 </html>

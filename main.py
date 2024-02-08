@@ -16,7 +16,7 @@ def startup():
 
 @app.get("/")
 async def query():
-    return FileResponse("static/index.html")
+    return FileResponse("static/html/index.html")
 
 
 @app.get("/students/{student}/")
