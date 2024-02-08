@@ -115,8 +115,8 @@
   <body>
     <div class="container">
       <div class="button-container button-group">
-        <button id="button1" onclick='onlyKeepForm("studentQuery")'><i class="fa fa-user"></i>Query Student</button>
         <button id="button5" onclick='onlyKeepForm("mixedQuery")'><i class="fa-solid fa-arrow-down-up-across-line"></i>Mixed Query</button>
+        <button id="button1" onclick='onlyKeepForm("studentQuery")'><i class="fa fa-user"></i>Query Student</button>
         <button id="button2" onclick='onlyKeepForm("panelQuery")'><i class="fa fa-solar-panel"></i>Query Panel</button>
       </div>
       <div class="button-container button-group">
@@ -163,12 +163,12 @@
 
       function hideAllForms(){
         for(let formId of formIds){
-          console.log(formId)
           document.getElementById(formId).style.display = 'none';
         }
       }
       function onlyKeepForm(id){
         hideAllForms();
+        hideTable()
         document.getElementById(id).style.display = 'block';
       }
       function uploadOrdersFile() {
@@ -240,33 +240,53 @@
         }
       }
       function downloadMixed() {
-        const query = document.getElementById('mixedQuerySearchInputSearchInput').value;
-        if (panel.trim() !== '') {
+        const query = document.getElementById('mixedSearchInput').value;
+        if (query.trim() !== '') {
           window.open(`http://127.0.0.1:8000/mixed/${query}/download`)
         }
       }
 
-      function displayData(data) {
+      function hideTable(){
         const table = document.getElementById('dataTable');
+        table.style.display = 'none';
+      }
+      function unhideTable(){
+        const table = document.getElementById('dataTable');
+        table.style.display = 'block';
+      }
+      function emptyTable(){
+        const table = document.getElementById('dataTable');
+
         while (table.firstChild) {
           table.removeChild(table.firstChild);
         }
+      }
+      function displayData(data) {
+        const table = document.getElementById('dataTable');
+        emptyTable();
 
-        for (let property in data[0]) {
-          if (data[0].hasOwnProperty(property)) {
-            const row = table.insertRow();
-            const cellHeader = row.insertCell();
-            cellHeader.textContent = property;
-            cellHeader.style.fontWeight = 'bold';
+        if(!data || !data.length){
+          console.log("HEREE")
+          const row = table.insertRow();
+          const cellHeader = row.insertCell();
+          cellHeader.textContent = "Nothing found";
+          cellHeader.style.fontWeight = 'bold';
+        } else {
+          for (let property in data[0]) {
+            if (data[0].hasOwnProperty(property)) {
+              const row = table.insertRow();
+              const cellHeader = row.insertCell();
+              cellHeader.textContent = property;
+              cellHeader.style.fontWeight = 'bold';
 
-            data.forEach(function(item) {
-              const cell = row.insertCell();
-              cell.textContent = item[property];
-            });
+              data.forEach(function(item) {
+                const cell = row.insertCell();
+                cell.textContent = item[property];
+              });
+            }
           }
         }
-
-        table.style.display = 'block';
+        unhideTable();
       }
     </script>
   </body>
