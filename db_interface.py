@@ -1,10 +1,9 @@
 import io
-
 import pandas as pd
-from sqlalchemy import create_engine, MetaData, delete, select
+from datetime import datetime
+from sqlalchemy import create_engine, MetaData, delete, select, func
 from sqlalchemy.orm import sessionmaker
 from starlette.responses import StreamingResponse
-
 from models import Base
 from models.flash import Flash
 from models.order import Order
@@ -23,12 +22,14 @@ class DBInterface:
     def download_df(self, df, name):
         buffer = io.BytesIO()
         with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
-            df.to_excel(writer, index=False, sheet_name="User Info")
+            df.to_excel(writer, index=False, sheet_name=name)
         buffer.seek(0)
         return StreamingResponse(
             buffer,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": f'attachment; filename="{name}_info.xlsx"'},
+            headers={
+                "Content-Disposition": f'attachment; filename="{name}_infos_{datetime.now().date()}.xlsx"'
+            },
         )
 
     def import_infos(self, excel_file, table_name):
@@ -63,6 +64,9 @@ class DBInterface:
     def import_order_infos(self, excel_file):
         self.import_infos(excel_file, self.orders_table_name)
 
+    def clean_df(self, df):
+        df.where(pd.notnull(df), "-", inplace=True)
+
     def df_from_query(self, query):
         with self.engine.connect() as connection:
             order_result = connection.execute(query)
@@ -71,23 +75,36 @@ class DBInterface:
             df_query = pd.DataFrame(rows, columns=columns)
         return df_query
 
-    def get_user_infos(self, user: str):
-        order_query = select(Order).where(Order.Anschrift1.in_([user]))
+    def complement_orders_with_flash(self, order_query):
         df_order = self.df_from_query(order_query)
         serial_numbers = df_order["Seriennummer"]
-        flash_query = select(Flash).where(Flash.Seriennummer.in_(serial_numbers))
+        flash_query = select(Flash).where(Flash.Seriennummer in serial_numbers)
         df_flash = self.df_from_query(flash_query)
         merged_df = df_order.merge(df_flash, how="left", on="Seriennummer")
+        self.clean_df(merged_df)
         merged_df = merged_df.astype(str)
 
         return merged_df
 
+    def get_student_infos(self, student: str):
+        order_query = select(Order).where(
+            func.lower(Order.Anschrift1).like(f"%{student}%")
+        )
+        return self.complement_orders_with_flash(order_query)
+
+    def get_mixed_infos(self, query: str):
+        order_query = select(Order).where(
+            func.lower(Order.Anschrift2).like(f"%{query}%")
+        )
+        return self.complement_orders_with_flash(order_query)
+
     def get_panel_info(self, panel: str):
-        order_query = select(Order).where(Order.Seriennummer.in_([panel]))
+        order_query = select(Order).where(Order.Seriennummer == panel)
         df_order = self.df_from_query(order_query)
-        flash_query = select(Flash).where(Flash.Seriennummer.in_([panel]))
+        flash_query = select(Flash).where(Flash.Seriennummer == panel)
         df_flash = self.df_from_query(flash_query)
         merged_df = df_order.merge(df_flash, how="outer", on="Seriennummer")
+        self.clean_df(merged_df)
         merged_df = merged_df.astype(str)
 
         return merged_df
