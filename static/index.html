@@ -1,276 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SOL QUICKFIX</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-  <style>
-    body {
-      font-family: Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
-    .button-container {
-      text-align: center;
-    }
-
-    .button-container button {
-      margin: 5px; /* Adjust as necessary for desired spacing */
-    }
-
-    button {
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s, box-shadow 0.2s;
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    button i {
-      margin-right: 5px;
-    }
-    .table-container {
-      overflow-x: auto; /* Enable horizontal scrolling */
-      margin-top: 20px; /* Keep the spacing consistent */
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 12px;
-    }
-
-    th {
-      background-color: #f2f2f2;
-      position: sticky;
-      left: 0;
-      background-color: #fff;
-      box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
-    }
-
-    tr:nth-child(odd) td:first-child {
-      background-color: #f9f9f9;
-    }
-
-    tr:nth-child(even) td:first-child {
-      background-color: #f2f2f2;
-    }
-
-    tr td:first-child {
-      font-weight: bold;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    .form-hidden {
-      display: none;
-    }
-
-    .form-group {
-      margin: 10px;
-    }
-
-    input[type="text"], input[type="file"] {
-      padding: 10px;
-      margin-right: 10px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-      width: calc(100% - 260px);
-    }
-
-    input[type="file"] {
-      border: none;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="button-container button-group">
-      <button id="button1" onclick="queryUser()"><i class="fa fa-user"></i>Query User</button>
-      <button id="button2" onclick="queryPanel()"><i class="fa fa-solar-panel"></i>Query Panel</button>
-      <button id="button3" onclick="uploadOrders()"><i class="fa fa-upload"></i>Upload Orders</button>
-      <button id="button4" onclick="uploadFlash()"><i class="fa fa-upload"></i>Upload Flash</button>
-    </div>
-  <div>
-
-  <div>
-    <div id="userQuery" class="form-hidden form-group">
-      <input type="text" id="userSearchInput" name="query" placeholder="Name of User...">
-      <button onclick="submitUserForm()">Search</button>
-      <button onclick="downloadUser()">Download</button>
-    </div>
-
-    <div id="panelQuery" class="form-hidden form-group">
-      <input type="text" id="panelSearchInput" name="query" placeholder="Serial number of Panel...">
-      <button onclick="submitPanelForm()">Search</button>
-      <button onclick="downloadPanel()">Download</button>
-    </div>
-
-    <div id="orderUpload" class="form-hidden form-group">
-      <input type="file" id="ordersFileInput" name="ORDERS FILE" multiple />
-      <button onclick="uploadOrdersFile()">Upload Orders</button>
-    </div>
-
-    <div id="flashUpload" class="form-hidden form-group">
-      <input type="file" id="flashFileInput" name="FLASH FILE" multiple />
-      <button onclick="uploadFlashFile()">Upload Flash</button>
-    </div>
-    <div class="table-container">
-      <table id="dataTable" class="form-hidden"></table>
-    </div>
-  </div>
-
-  <script>
-    function hideButtons(){
-    }
-
-    function unhideForm(id){
-      document.getElementById(id).style.display = 'block';
-    }
-    function hideForm(id){
-      document.getElementById(id).style.display = 'none';
-    }
-    function queryUser() {
-      hideButtons();
-      unhideForm('userQuery');
-      hideForm('orderUpload');
-      hideForm('flashUpload');
-      hideForm('panelQuery');
-    }
-    function uploadOrders(){
-      hideButtons();
-      unhideForm('orderUpload');
-      hideForm('userQuery');
-      hideForm('flashUpload');
-      hideForm('panelQuery');
-    }
-    function uploadFlash(){
-      hideButtons();
-      unhideForm('flashUpload');
-      hideForm('userQuery');
-      hideForm('orderUpload');
-      hideForm('panelQuery');
-    }
-    function queryPanel() {
-      hideButtons();
-      unhideForm('panelQuery');
-      hideForm('userQuery');
-      hideForm('orderUpload');
-      hideForm('flashUpload');
-    }
-    function uploadOrdersFile() {
-      const formData = new FormData();
-      const file = document.getElementById('ordersFileInput').files[0];
-      formData.append('file', file);
-      fetch('http://127.0.0.1:8000/upload_orders/', {
-        method: 'POST',
-        body: formData
-      });
-      window.location.reload();
-    }
-    function uploadFlashFile() {
-      const formData = new FormData();
-      const file = document.getElementById('flashFileInput').files[0];
-      formData.append('file', file);
-      fetch('http://127.0.0.1:8000/upload_flash/', {
-        method: 'POST',
-        body: formData
-      });
-      window.location.reload();
-    }
-    function submitUserForm() {
-      var username = document.getElementById('userSearchInput').value;
-      if (username.trim() !== '') {
-        fetch(`http://127.0.0.1:8000/users/${username}`)
-          .then(response => response.json())
-          .then(data => {
-            displayData(data);
-          })
-          .catch(error => console.error('Error:', error));
-
-        fetch(`http://127.0.0.1:8000/download_user/${username}`)
-          .then(response => response.json())
-          .then(data => {
-            displayData(data);
-          })
-          .catch(error => console.error('Error:', error));
-      }
-    }
-    function downloadUser() {
-      var username = document.getElementById('userSearchInput').value;
-      if (username.trim() !== '') {
-        window.open(`http://127.0.0.1:8000/users/${username}/download`)
-      }
-    }
-    function downloadPanel() {
-      var panel = document.getElementById('panelSearchInput').value;
-      if (panel.trim() !== '') {
-        window.open(`http://127.0.0.1:8000/panels/${panel}/download`)
-      }
-    }
-    function submitPanelForm() {
-      var panel = document.getElementById('panelSearchInput').value;
-      if (panel.trim() !== '') {
-        fetch(`http://127.0.0.1:8000/panels/${panel}`)
-          .then(response => response.json())
-          .then(data => {
-            displayData(data);
-          })
-          .catch(error => console.error('Error:', error));
-      }
-    }
-
-    function displayData(data) {
-      var table = document.getElementById('dataTable');
-      while (table.firstChild) {
-        table.removeChild(table.firstChild);
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOL QUICKFIX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+      body {
+        font-family: Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 20px;
+        color: #333;
       }
 
-      for (var property in data[0]) {
-        if (data[0].hasOwnProperty(property)) {
-          var row = table.insertRow();
-          var cellHeader = row.insertCell();
-          cellHeader.textContent = property;
-          cellHeader.style.fontWeight = 'bold';
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      .button-container {
+        text-align: center;
+      }
 
-          data.forEach(function(item) {
-            var cell = row.insertCell();
-            cell.textContent = item[property];
-          });
+      .button-container button {
+        margin: 5px; /* Adjust as necessary for desired spacing */
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        margin: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s, box-shadow 0.2s;
+        font-size: 0.9rem;
+        outline: none;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      button i {
+        margin-right: 5px;
+      }
+      .table-container {
+        overflow-x: auto; /* Enable horizontal scrolling */
+        margin-top: 20px; /* Keep the spacing consistent */
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 12px;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        position: sticky;
+        left: 0;
+        background-color: #fff;
+        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+      }
+
+      tr:nth-child(odd) td:first-child {
+        background-color: #f9f9f9;
+      }
+
+      tr:nth-child(even) td:first-child {
+        background-color: #f2f2f2;
+      }
+
+      tr td:first-child {
+        font-weight: bold;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .form-hidden {
+        display: none;
+      }
+
+      .form-group {
+        margin: 10px;
+      }
+
+      input[type="text"], input[type="file"] {
+        padding: 10px;
+        margin-right: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        width: calc(100% - 260px);
+      }
+
+      input[type="file"] {
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="button-container button-group">
+        <button id="button1" onclick='onlyKeepForm("studentQuery")'><i class="fa fa-user"></i>Query Student</button>
+        <button id="button5" onclick='onlyKeepForm("mixedQuery")'><i class="fa-solid fa-arrow-down-up-across-line"></i>Mixed Query</button>
+        <button id="button2" onclick='onlyKeepForm("panelQuery")'><i class="fa fa-solar-panel"></i>Query Panel</button>
+      </div>
+      <div class="button-container button-group">
+        <button id="button3" onclick='onlyKeepForm("orderUpload")'><i class="fa fa-upload"></i>Upload Orders</button>
+        <button id="button4" onclick='onlyKeepForm("flashUpload")'><i class="fa fa-upload"></i>Upload Flash</button>
+      </div>
+    <div>
+
+    <div>
+      <div id="studentQuery" class="form-hidden form-group">
+        <input type="text" id="studentSearchInput" name="query" placeholder="Name of Student...">
+        <button onclick="submitStudentForm()">Search</button>
+        <button onclick="downloadStudent()">Download</button>
+      </div>
+
+      <div id="mixedQuery" class="form-hidden form-group">
+        <input type="text" id="mixedSearchInput" name="query" placeholder="Name of Customer | Order Number | Telephone number...">
+        <button onclick="submitMixedForm()">Search</button>
+        <button onclick="downloadMixed()">Download</button>
+      </div>
+
+      <div id="panelQuery" class="form-hidden form-group">
+        <input type="text" id="panelSearchInput" name="query" placeholder="Serial number of Panel...">
+        <button onclick="submitPanelForm()">Search</button>
+        <button onclick="downloadPanel()">Download</button>
+      </div>
+
+      <div id="orderUpload" class="form-hidden form-group">
+        <input type="file" id="ordersFileInput" name="ORDERS FILE" multiple />
+        <button onclick="uploadOrdersFile()">Upload Orders</button>
+      </div>
+
+      <div id="flashUpload" class="form-hidden form-group">
+        <input type="file" id="flashFileInput" name="FLASH FILE" multiple />
+        <button onclick="uploadFlashFile()">Upload Flash</button>
+      </div>
+      <div class="table-container">
+        <table id="dataTable" class="form-hidden"></table>
+      </div>
+    </div>
+
+    <script>
+      const formIds = ['studentQuery', 'orderUpload', 'flashUpload', 'panelQuery', 'mixedQuery']
+
+      function hideAllForms(){
+        for(let formId of formIds){
+          console.log(formId)
+          document.getElementById(formId).style.display = 'none';
+        }
+      }
+      function onlyKeepForm(id){
+        hideAllForms();
+        document.getElementById(id).style.display = 'block';
+      }
+      function uploadOrdersFile() {
+        const formData = new FormData();
+        const file = document.getElementById('ordersFileInput').files[0];
+        formData.append('file', file);
+        fetch('http://127.0.0.1:8000/upload_orders/', {
+          method: 'POST',
+          body: formData
+        });
+        window.location.reload();
+      }
+      function uploadFlashFile() {
+        const formData = new FormData();
+        const file = document.getElementById('flashFileInput').files[0];
+        formData.append('file', file);
+        fetch('http://127.0.0.1:8000/upload_flash/', {
+          method: 'POST',
+          body: formData
+        });
+        window.location.reload();
+      }
+      function submitStudentForm() {
+        const name = document.getElementById('studentSearchInput').value;
+        if (name.trim() !== '') {
+          fetch(`http://127.0.0.1:8000/students/${name}`)
+            .then(response => response.json())
+            .then(data => {
+              displayData(data);
+            })
+            .catch(error => console.error('Error:', error));
         }
       }
 
-      table.style.display = 'block';
-    }
-  </script>
-</body>
+      function submitPanelForm() {
+        const panel = document.getElementById('panelSearchInput').value;
+        if (panel.trim() !== '') {
+          fetch(`http://127.0.0.1:8000/panels/${panel}`)
+            .then(response => response.json())
+            .then(data => {
+              displayData(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+      }
+
+      function submitMixedForm() {
+        const query = document.getElementById('mixedSearchInput').value;
+        if (query.trim() !== '') {
+          fetch(`http://127.0.0.1:8000/mixed/${query}`)
+            .then(response => response.json())
+            .then(data => {
+              displayData(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+      }
+
+      function downloadStudent() {
+        const name = document.getElementById('studentSearchInput').value;
+        if (name.trim() !== '') {
+          window.open(`http://127.0.0.1:8000/students/${name}/download`)
+        }
+      }
+      function downloadPanel() {
+        const panel = document.getElementById('panelSearchInput').value;
+        if (panel.trim() !== '') {
+          window.open(`http://127.0.0.1:8000/panels/${panel}/download`)
+        }
+      }
+      function downloadMixed() {
+        const query = document.getElementById('mixedQuerySearchInputSearchInput').value;
+        if (panel.trim() !== '') {
+          window.open(`http://127.0.0.1:8000/mixed/${query}/download`)
+        }
+      }
+
+      function displayData(data) {
+        const table = document.getElementById('dataTable');
+        while (table.firstChild) {
+          table.removeChild(table.firstChild);
+        }
+
+        for (let property in data[0]) {
+          if (data[0].hasOwnProperty(property)) {
+            const row = table.insertRow();
+            const cellHeader = row.insertCell();
+            cellHeader.textContent = property;
+            cellHeader.style.fontWeight = 'bold';
+
+            data.forEach(function(item) {
+              const cell = row.insertCell();
+              cell.textContent = item[property];
+            });
+          }
+        }
+
+        table.style.display = 'block';
+      }
+    </script>
+  </body>
 </html>
