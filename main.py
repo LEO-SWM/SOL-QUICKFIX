@@ -3,7 +3,6 @@ from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 from db_interface import DBInterface
 
-# Create a FastAPI app
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -20,9 +19,9 @@ async def query():
     return FileResponse("static/index.html")
 
 
-@app.get("/users/{user}/")
-async def query_user(user):
-    return db_interface.get_user_infos(user).to_dict(orient="records")
+@app.get("/students/{student}/")
+async def query_student(student):
+    return db_interface.get_student_infos(student).to_dict(orient="records")
 
 
 @app.get("/panels/{panel}/")
@@ -30,16 +29,27 @@ async def query_serial_number(panel):
     return db_interface.get_panel_info(panel).to_dict(orient="records")
 
 
-@app.get("/users/{user}/download")
-async def download_user(user):
-    df = db_interface.get_user_infos(user)
-    return db_interface.download_df(df, user)
+@app.get("/mixed/{query}/")
+async def query_mixed(query):
+    return db_interface.get_mixed_infos(query).to_dict(orient="records")
+
+
+@app.get("/students/{student}/download")
+async def download_student(student):
+    df = db_interface.get_student_infos(student)
+    return db_interface.download_df(df, student)
 
 
 @app.get("/panels/{panel}/download")
 async def download_panel(panel):
     df = db_interface.get_panel_info(panel)
     return db_interface.download_df(df, panel)
+
+
+@app.get("/mixed/{query}/download")
+async def download_mixed(query):
+    df = db_interface.get_mixed_infos(query)
+    return db_interface.download_df(df, query)
 
 
 @app.post("/upload_orders/")
